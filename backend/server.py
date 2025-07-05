@@ -108,124 +108,21 @@ class BulkEmailRequest(BaseModel):
     template: str = ""
     schedule_time: Optional[datetime] = None
 
-# Default email template
-DEFAULT_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ subject }}</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            text-align: center;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .offer {
-            color: #e74c3c;
-            font-weight: bold;
-            font-size: 20px;
-            background: linear-gradient(45deg, #fff3cd, #ffeaa7);
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin: 25px 0;
-            border-left: 4px solid #e74c3c;
-        }
-        .content {
-            font-size: 16px;
-            line-height: 1.8;
-        }
-        .custom-message {
-            background-color: #e8f5e8;
-            padding: 15px;
-            border-radius: 6px;
-            margin: 20px 0;
-            border-left: 4px solid #28a745;
-        }
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 14px;
-            color: #666;
-            text-align: center;
-        }
-        .button {
-            display: inline-block;
-            padding: 12px 30px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            margin: 20px 0;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎉 Special Offer Just for You!</h1>
-        </div>
-        
-        <div class="content">
-            <p>Dear <strong>{{ context.name }}</strong>,</p>
-            
-            <p>We hope this email finds you well! We're excited to share an exclusive offer with you:</p>
-            
-            <div class="offer">
-                🎁 {{ context.offer }}
-            </div>
-            
-            {% if context.custom_message %}
-            <div class="custom-message">
-                <strong>Personal Message:</strong><br>
-                {{ context.custom_message }}
-            </div>
-            {% endif %}
-            
-            <p>This offer is personalized just for you. Don't miss out on this amazing opportunity!</p>
-            
-            <p>To take advantage of this offer, simply reply to this email or contact us directly.</p>
-            
-            <p>Thank you for being a valued customer!</p>
-            
-            <p>Best regards,<br>
-            <strong>The Team</strong></p>
-        </div>
-        
-        <div class="footer">
-            <p>📧 This email was sent with our Automatic Email Sender</p>
-            <p>⏰ Sent on: {{ current_time }}</p>
-        </div>
-    </div>
-</body>
-</html>
-"""
+# Default email template - Simple Plain Text
+DEFAULT_TEMPLATE = """Hi {{ context.name }},
+
+{{ context.custom_message }}
+
+{% if context.offer %}
+{{ context.offer }}
+{% endif %}
+
+Best regards,
+{{ sender_name }}
+{{ sender_email }}
+{% if sender_phone %}
+{{ sender_phone }}
+{% endif %}"""
 
 # Email utility functions
 async def render_email_template(template_str: str, context: Dict[str, Any]) -> str:
