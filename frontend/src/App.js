@@ -166,76 +166,83 @@ const App = () => {
         return;
       }
 
+      console.log('Recipients:', recipients);
+      console.log('Subjects:', subjects);
+      console.log('Custom Messages:', customMessages);
+
       let response;
       
-      if (formData.isBulk && formData.personalizedEmails.some(email => email.trim())) {
-        // Send personalized emails with different content for each recipient
+      // If multiple recipients, always treat as bulk (regardless of bulk mode checkbox)
+      if (recipients.length > 1) {
+        // Multiple recipients - send individual emails
         const results = [];
         
-        for (let i = 0; i < recipients.length; i++) {
-          const emailContent = formData.personalizedEmails[i] || formData.personalizedEmails[0] || '';
-          const emailSubject = subjects[i] || subjects[subjects.length - 1] || subjects[0];
-          
-          if (!emailContent.trim()) {
-            showMessage(`Please provide email content for recipient ${i + 1}`, 'error');
-            setLoading(false);
-            return;
-          }
-          
-          const endpoint = formData.isScheduled ? '/api/schedule-personalized-email' : '/api/send-personalized-email';
-          
-          const payload = {
-            recipient: recipients[i],
-            subject: emailSubject,
-            email_body: emailContent,
-            ...(formData.isScheduled && { schedule_time: formData.scheduleTime })
-          };
+        // Check if using personalized email bodies
+        if (formData.isBulk && formData.personalizedEmails.some(email => email.trim())) {
+          // Send completely personalized emails with different content for each recipient
+          for (let i = 0; i < recipients.length; i++) {
+            const emailContent = formData.personalizedEmails[i] || formData.personalizedEmails[0] || '';
+            const emailSubject = subjects[i] || subjects[subjects.length - 1] || subjects[0];
+            
+            if (!emailContent.trim()) {
+              showMessage(`Please provide email content for recipient ${i + 1}`, 'error');
+              setLoading(false);
+              return;
+            }
+            
+            const endpoint = formData.isScheduled ? '/api/schedule-personalized-email' : '/api/send-personalized-email';
+            
+            const payload = {
+              recipient: recipients[i],
+              subject: emailSubject,
+              email_body: emailContent,
+              ...(formData.isScheduled && { schedule_time: formData.scheduleTime })
+            };
 
-          try {
-            const res = await axios.post(`${backendUrl}${endpoint}`, payload);
-            results.push({ recipient: recipients[i], success: true, message: res.data.message });
-          } catch (error) {
-            results.push({ recipient: recipients[i], success: false, message: error.response?.data?.detail || error.message });
+            try {
+              const res = await axios.post(`${backendUrl}${endpoint}`, payload);
+              results.push({ recipient: recipients[i], success: true, message: res.data.message });
+            } catch (error) {
+              results.push({ recipient: recipients[i], success: false, message: error.response?.data?.detail || error.message });
+            }
           }
-        }
-        
-        const successful = results.filter(r => r.success).length;
-        showMessage(`Personalized emails: ${successful}/${recipients.length} sent successfully`, 'success');
-        
-      } else if (formData.isBulk) {
-        // Enhanced bulk email sending with multiple subjects and custom messages
-        const results = [];
-        
-        for (let i = 0; i < recipients.length; i++) {
-          const emailSubject = subjects[i] || subjects[subjects.length - 1] || subjects[0];
-          const customMessage = customMessages[i] || customMessages[customMessages.length - 1] || formData.customMessage || '';
           
-          const context = {
-            name: formData.name || 'Valued Customer',
-            offer: formData.offer || 'Special Offer',
-            custom_message: customMessage
-          };
+          const successful = results.filter(r => r.success).length;
+          showMessage(`Personalized emails: ${successful}/${recipients.length} sent successfully`, 'success');
           
-          const endpoint = formData.isScheduled ? '/api/schedule-email' : '/api/send-email';
-          
-          const payload = {
-            recipient: recipients[i],
-            subject: emailSubject,
-            context: context,
-            template: formData.template || '',
-            ...(formData.isScheduled && { schedule_time: formData.scheduleTime })
-          };
+        } else {
+          // Send emails with templates and individual subjects/messages
+          for (let i = 0; i < recipients.length; i++) {
+            const emailSubject = subjects[i] || subjects[subjects.length - 1] || subjects[0];
+            const customMessage = customMessages[i] || customMessages[customMessages.length - 1] || formData.customMessage || '';
+            
+            const context = {
+              name: formData.name || 'Valued Customer',
+              offer: formData.offer || 'Special Offer',
+              custom_message: customMessage
+            };
+            
+            const endpoint = formData.isScheduled ? '/api/schedule-email' : '/api/send-email';
+            
+            const payload = {
+              recipient: recipients[i],
+              subject: emailSubject,
+              context: context,
+              template: formData.template || '',
+              ...(formData.isScheduled && { schedule_time: formData.scheduleTime })
+            };
 
-          try {
-            const res = await axios.post(`${backendUrl}${endpoint}`, payload);
-            results.push({ recipient: recipients[i], success: true, message: res.data.message });
-          } catch (error) {
-            results.push({ recipient: recipients[i], success: false, message: error.response?.data?.detail || error.message });
+            try {
+              const res = await axios.post(`${backendUrl}${endpoint}`, payload);
+              results.push({ recipient: recipients[i], success: true, message: res.data.message });
+            } catch (error) {
+              results.push({ recipient: recipients[i], success: false, message: error.response?.data?.detail || error.message });
+            }
           }
+          
+          const successful = results.filter(r => r.success).length;
+          showMessage(`Multiple emails: ${successful}/${recipients.length} sent successfully`, 'success');
         }
-        
-        const successful = results.filter(r => r.success).length;
-        showMessage(`Enhanced bulk emails: ${successful}/${recipients.length} sent successfully`, 'success');
         
       } else {
         // Single email sending
