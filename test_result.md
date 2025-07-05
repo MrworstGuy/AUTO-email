@@ -178,8 +178,9 @@
 
 ## test_plan:
   current_focus:
-    - "Email sending functionality"
-    - "UI responsiveness"
+    - "Enhanced personalization feature"
+    - "Multiple subjects functionality"
+    - "Custom messages para by para"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
@@ -189,3 +190,5 @@
       message: "Successfully set up Auto-Email application with both backend and frontend running. Backend using FastAPI with Gmail SMTP integration, frontend using React with modern UI. All services started via supervisor and working properly."
     - agent: "testing"
       message: "Completed testing of backend API endpoints as requested. All endpoints (/api/health, /api/, /api/scheduled-emails, /api/email-logs) are working correctly. The backend server is healthy, database connection is working, and the API is responding properly. No issues found with the backend infrastructure."
+    - agent: "main"
+      message: "Enhanced personalization feature implemented: Added support for multiple subjects (one per line or comma-separated), enhanced custom messages (para by para), improved bulk email logic to handle individual subjects and messages per recipient. Frontend updated with new UI components and validation logic."
