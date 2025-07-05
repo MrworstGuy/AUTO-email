@@ -183,7 +183,7 @@ async def send_single_email(recipient: str, subject: str, context: EmailContext,
         email_template = template if template.strip() else DEFAULT_TEMPLATE
         
         # Render template
-        html_content = await render_email_template(email_template, {
+        plain_content = await render_email_template(email_template, {
             'subject': subject,
             'context': context.dict()
         })
@@ -192,8 +192,8 @@ async def send_single_email(recipient: str, subject: str, context: EmailContext,
         message = MessageSchema(
             subject=subject,
             recipients=[recipient],
-            body=html_content,
-            subtype="html"
+            body=plain_content,
+            subtype="plain"
         )
         
         # Send email
