@@ -458,7 +458,7 @@ Your Title
 
           {/* Enhanced Personalization Section */}
           <div className="form-section">
-            <h3>🎨 Enhanced Personalization</h3>
+            <h3>🎨 Email Content</h3>
             
             <div className="form-group">
               <label>Custom Messages (separate each message with double line breaks):</label>
@@ -466,18 +466,33 @@ Your Title
                 name="customMessages"
                 value={formData.customMessages}
                 onChange={handleInputChange}
-                placeholder="Message for recipient 1
-This is a personalized message for the first recipient.
+                placeholder="Hi Team,
 
-Message for recipient 2
-This is a personalized message for the second recipient.
+We hope this message finds you well. We're excited to share this opportunity with you.
 
-Message for recipient 3
-This is a personalized message for the third recipient."
+Want to explore more about our services? Feel free to reach out.
+
+Best regards,
+Your Name
+your.email@company.com
++1234567890
+
+---
+
+Hi [Company Name],
+
+Thank you for your interest in our services. We'd love to discuss how we can help you achieve your goals.
+
+Looking forward to connecting with you soon.
+
+Best regards,
+Your Name
+your.email@company.com
++1234567890"
                 rows="12"
                 className="personalized-messages-textarea"
               />
-              <p className="helper-text">Enter personalized messages for each recipient. Separate each message with double line breaks (empty line between messages). If fewer messages than recipients, the last message will be reused.</p>
+              <p className="helper-text">📧 <strong>Note:</strong> Emails will be sent as simple plain text (like the professional emails you receive daily). Separate each message with double line breaks for different recipients.</p>
             </div>
 
             <div className="form-row">
@@ -488,18 +503,18 @@ This is a personalized message for the third recipient."
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  placeholder="Valued Customer"
+                  placeholder="Team / Company Name"
                 />
               </div>
 
               <div className="form-group">
-                <label>Default Offer Details (fallback):</label>
+                <label>Default Offer/Content (fallback):</label>
                 <input
                   type="text"
                   name="offer"
                   value={formData.offer}
                   onChange={handleInputChange}
-                  placeholder="Special 50% Off Deal"
+                  placeholder="Your offer or main content"
                 />
               </div>
             </div>
@@ -510,8 +525,13 @@ This is a personalized message for the third recipient."
                 name="customMessage"
                 value={formData.customMessage}
                 onChange={handleInputChange}
-                placeholder="Add a default personal message here..."
-                rows="3"
+                placeholder="Hi there,
+
+Thank you for your interest. We'd love to connect with you.
+
+Best regards,
+Your Name"
+                rows="4"
               />
             </div>
           </div>
