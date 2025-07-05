@@ -489,7 +489,6 @@ Your Name
 your.email@company.com
 +1234567890
 
----
 
 Hi [Company Name],
 
@@ -501,10 +500,10 @@ Best regards,
 Your Name
 your.email@company.com
 +1234567890"
-                rows="12"
+                rows="15"
                 className="personalized-messages-textarea"
               />
-              <p className="helper-text">📧 <strong>Note:</strong> Emails will be sent as simple plain text (like the professional emails you receive daily). Separate each message with double line breaks for different recipients.</p>
+              <p className="helper-text">💬 <strong>Each message separated by double line breaks (empty line between)</strong> - Each recipient will get their corresponding message. If fewer messages than recipients, the last message will be reused.</p>
             </div>
 
             <div className="form-row">
