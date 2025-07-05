@@ -313,15 +313,16 @@ const App = () => {
             </div>
 
             <div className="form-group">
-              <label>Subject:</label>
-              <input
-                type="text"
-                name="subject"
-                value={formData.subject}
+              <label>Subjects (one per line or comma-separated):</label>
+              <textarea
+                name="subjects"
+                value={formData.subjects}
                 onChange={handleInputChange}
-                placeholder="Enter email subject..."
+                placeholder="Subject for recipient 1&#10;Subject for recipient 2&#10;Subject for recipient 3"
+                rows="4"
                 required
               />
+              <p className="helper-text">Enter multiple subjects - one for each recipient. If fewer subjects than recipients, the last subject will be reused.</p>
             </div>
 
             <div className="form-options">
