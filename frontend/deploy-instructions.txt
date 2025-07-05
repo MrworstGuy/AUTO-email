@@ -1,0 +1,9 @@
+# Build the frontend
+cd /app/frontend
+yarn build
+
+# The 'build' folder will be created
+# Upload this folder to Netlify
+
+# Environment variable for Netlify:
+# REACT_APP_BACKEND_URL=https://yourapp.railway.app
