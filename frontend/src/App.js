@@ -428,47 +428,65 @@ Your Title
             </div>
           )}
 
-          {/* Regular Personalization Section (for non-bulk or template-based emails) */}
-          {!formData.isBulk && (
-            <div className="form-section">
-              <h3>🎨 Personalization</h3>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Recipient Name:</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="Valued Customer"
-                  />
-                </div>
+          {/* Enhanced Personalization Section */}
+          <div className="form-section">
+            <h3>🎨 Enhanced Personalization</h3>
+            
+            <div className="form-group">
+              <label>Custom Messages (separate each message with double line breaks):</label>
+              <textarea
+                name="customMessages"
+                value={formData.customMessages}
+                onChange={handleInputChange}
+                placeholder="Message for recipient 1
+This is a personalized message for the first recipient.
 
-                <div className="form-group">
-                  <label>Offer Details:</label>
-                  <input
-                    type="text"
-                    name="offer"
-                    value={formData.offer}
-                    onChange={handleInputChange}
-                    placeholder="Special 50% Off Deal"
-                  />
-                </div>
+Message for recipient 2
+This is a personalized message for the second recipient.
+
+Message for recipient 3
+This is a personalized message for the third recipient."
+                rows="12"
+                className="personalized-messages-textarea"
+              />
+              <p className="helper-text">Enter personalized messages for each recipient. Separate each message with double line breaks (empty line between messages). If fewer messages than recipients, the last message will be reused.</p>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Default Recipient Name (fallback):</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Valued Customer"
+                />
               </div>
 
               <div className="form-group">
-                <label>Custom Message:</label>
-                <textarea
-                  name="customMessage"
-                  value={formData.customMessage}
+                <label>Default Offer Details (fallback):</label>
+                <input
+                  type="text"
+                  name="offer"
+                  value={formData.offer}
                   onChange={handleInputChange}
-                  placeholder="Add a personal message here..."
-                  rows="3"
+                  placeholder="Special 50% Off Deal"
                 />
               </div>
             </div>
-          )}
+
+            <div className="form-group">
+              <label>Default Custom Message (fallback):</label>
+              <textarea
+                name="customMessage"
+                value={formData.customMessage}
+                onChange={handleInputChange}
+                placeholder="Add a default personal message here..."
+                rows="3"
+              />
+            </div>
+          </div>
 
           {/* Email Template Section (for template-based emails) */}
           {(!formData.isBulk || !formData.personalizedEmails.some(email => email.trim())) && (
