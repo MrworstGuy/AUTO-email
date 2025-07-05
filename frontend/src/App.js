@@ -341,10 +341,13 @@ const App = () => {
                 name="recipients"
                 value={formData.recipients}
                 onChange={handleInputChange}
-                placeholder="user1@example.com&#10;user2@example.com&#10;user3@example.com"
+                placeholder="user1@example.com
+user2@example.com
+user3@example.com"
                 rows="4"
                 required
               />
+              <p className="helper-text">📧 <strong>Enter each email on a new line</strong> - Each recipient will get their own personalized email automatically!</p>
             </div>
 
             <div className="form-group">
@@ -353,11 +356,13 @@ const App = () => {
                 name="subjects"
                 value={formData.subjects}
                 onChange={handleInputChange}
-                placeholder="Subject for recipient 1&#10;Subject for recipient 2&#10;Subject for recipient 3"
+                placeholder="Subject for recipient 1
+Subject for recipient 2
+Subject for recipient 3"
                 rows="4"
                 required
               />
-              <p className="helper-text">Enter multiple subjects - one for each recipient. If fewer subjects than recipients, the last subject will be reused.</p>
+              <p className="helper-text">📝 <strong>Enter each subject on a new line</strong> - Each recipient will get their corresponding subject. If fewer subjects than recipients, the last subject will be reused.</p>
             </div>
 
             <div className="form-options">
