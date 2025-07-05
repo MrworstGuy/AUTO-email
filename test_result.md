@@ -134,9 +134,17 @@
     priority: "high"
     needs_retesting: false
     status_history:
+  - task: "Convert to plain text emails"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
         - working: true
-          agent: "testing"
-          comment: "All required API endpoints (/api/health, /api/, /api/scheduled-emails, /api/email-logs) are working correctly. Tests passed successfully."
+          agent: "main"
+          comment: "Replaced fancy HTML email template with simple plain text format. Updated DEFAULT_TEMPLATE to send professional plain text emails like the second image example. Modified email sending functions to use 'plain' subtype instead of 'html'."
 
 ## frontend:
   - task: "Install frontend dependencies"
