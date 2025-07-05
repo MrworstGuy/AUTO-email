@@ -195,3 +195,5 @@
       message: "Completed testing of backend API endpoints as requested. All endpoints (/api/health, /api/, /api/scheduled-emails, /api/email-logs) are working correctly. The backend server is healthy, database connection is working, and the API is responding properly. No issues found with the backend infrastructure."
     - agent: "main"
       message: "Enhanced personalization feature implemented: Added support for multiple subjects (one per line or comma-separated), enhanced custom messages (para by para), improved bulk email logic to handle individual subjects and messages per recipient. Frontend updated with new UI components and validation logic."
+    - agent: "testing"
+      message: "Completed testing of the enhanced personalization feature. All new functionality works correctly: multiple subjects input, enhanced custom messages with paragraph breaks, bulk email with individual subjects and messages. Form validation works properly for missing recipients and subjects. UI is responsive and user-friendly with clear helper text. No issues found with the implementation."
