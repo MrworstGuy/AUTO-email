@@ -197,9 +197,9 @@
 
 ## test_plan:
   current_focus:
-    - "Enhanced personalization feature"
-    - "Multiple subjects functionality"
-    - "Custom messages para by para"
+    - "Plain text email functionality"
+    - "Email template conversion"
+    - "UI updates for plain text format"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
@@ -213,3 +213,5 @@
       message: "Enhanced personalization feature implemented: Added support for multiple subjects (one per line or comma-separated), enhanced custom messages (para by para), improved bulk email logic to handle individual subjects and messages per recipient. Frontend updated with new UI components and validation logic."
     - agent: "testing"
       message: "Completed testing of the enhanced personalization feature. All new functionality works correctly: multiple subjects input, enhanced custom messages with paragraph breaks, bulk email with individual subjects and messages. Form validation works properly for missing recipients and subjects. UI is responsive and user-friendly with clear helper text. No issues found with the implementation."
+    - agent: "main"
+      message: "Converted email system from fancy HTML templates to simple plain text format. Replaced complex HTML template with clean plain text template similar to professional business emails. Updated email sending functions to send plain text instead of HTML. Modified frontend UI to reflect plain text format with updated placeholders and helper text."
