@@ -159,6 +159,13 @@ class EmailSenderAPITest(unittest.TestCase):
         self.assertNotEqual(response.status_code, 200)
         print("✅ Missing required fields test passed")
         
+    def test_root_endpoint(self):
+        """Test the root API endpoint"""
+        response = requests.get(f"{self.api_url}/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Automatic Email Sender API" in response.text)
+        print("✅ Root endpoint test passed")
+        
     def test_custom_template(self):
         """Test sending email with custom template"""
         custom_template = """
