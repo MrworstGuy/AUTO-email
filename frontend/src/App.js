@@ -627,6 +627,7 @@ Your Name"
       <div className="footer">
         <p>🔧 Built with FastAPI + React + Gmail SMTP</p>
         <p>📧 Sending from: hackfinity.innovation@gmail.com</p>
+        <p>✉️ Emails sent as professional plain text format</p>
       </div>
     </div>
   );
