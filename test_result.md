@@ -126,6 +126,17 @@
         - working: true
           agent: "main"
           comment: "FastAPI backend server is running on port 8001, connected to MongoDB, scheduler started successfully"
+  - task: "Backend API endpoints"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "All required API endpoints (/api/health, /api/, /api/scheduled-emails, /api/email-logs) are working correctly. Tests passed successfully."
 
 ## frontend:
   - task: "Install frontend dependencies"
