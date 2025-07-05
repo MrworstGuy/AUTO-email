@@ -373,7 +373,7 @@ Subject for recipient 3"
                   checked={formData.isBulk}
                   onChange={handleInputChange}
                 />
-                <span>📦 Bulk email mode</span>
+                <span>📦 Enable advanced personalized email bodies (optional)</span>
               </label>
 
               <label className="checkbox-label">
@@ -386,6 +386,21 @@ Subject for recipient 3"
                 <span>⏰ Schedule sending</span>
               </label>
             </div>
+
+            {/* Quick Preview of Parsed Data */}
+            {(formData.recipients || formData.subjects || formData.customMessages) && (
+              <div className="form-group">
+                <div className="preview-section">
+                  <h4>📊 Quick Preview:</h4>
+                  <p>📧 Recipients detected: <strong>{parseRecipients(formData.recipients).length}</strong></p>
+                  <p>📝 Subjects detected: <strong>{parseSubjects(formData.subjects).length}</strong></p>
+                  <p>💬 Messages detected: <strong>{parseCustomMessages(formData.customMessages).length}</strong></p>
+                  {parseRecipients(formData.recipients).length > 1 && (
+                    <p className="success-text">✅ Multiple recipients detected - will send individual emails automatically!</p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {formData.isBulk && (
               <div className="form-group">
