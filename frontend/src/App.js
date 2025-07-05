@@ -130,6 +130,20 @@ const App = () => {
       .filter(email => email && email.includes('@'));
   };
 
+  const parseSubjects = (subjectsString) => {
+    return subjectsString
+      .split(/[,;\n]/)
+      .map(subject => subject.trim())
+      .filter(subject => subject);
+  };
+
+  const parseCustomMessages = (messagesString) => {
+    return messagesString
+      .split(/\n\n+/) // Split by double newlines (paragraph breaks)
+      .map(message => message.trim())
+      .filter(message => message);
+  };
+
   const handleSendEmail = async () => {
     if (!validateForm()) return;
 
