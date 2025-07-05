@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-## user_problem_statement: "i wanna send custom personalised messages to everyone so modify in personalization where i can do this Recipients (one per line or comma-separated): subjects can be multiples (one per line or comma-separated): and the custom messages too para by para"
+## user_problem_statement: "modify the code i dont need like fancy HTML email template and i need simple plain text emails like professional emails"
 ## backend:
   - task: "Install backend dependencies"
     implemented: true
