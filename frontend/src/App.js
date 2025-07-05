@@ -112,8 +112,8 @@ const App = () => {
       showMessage('Please enter at least one recipient email address', 'error');
       return false;
     }
-    if (!formData.subject.trim()) {
-      showMessage('Please enter an email subject', 'error');
+    if (!formData.subjects.trim() && !formData.subject.trim()) {
+      showMessage('Please enter at least one email subject', 'error');
       return false;
     }
     if (formData.isScheduled && !formData.scheduleTime) {
