@@ -180,3 +180,5 @@
 ## agent_communication:
     - agent: "main"
       message: "Successfully set up Auto-Email application with both backend and frontend running. Backend using FastAPI with Gmail SMTP integration, frontend using React with modern UI. All services started via supervisor and working properly."
+    - agent: "testing"
+      message: "Completed testing of backend API endpoints as requested. All endpoints (/api/health, /api/, /api/scheduled-emails, /api/email-logs) are working correctly. The backend server is healthy, database connection is working, and the API is responding properly. No issues found with the backend infrastructure."
