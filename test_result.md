@@ -164,11 +164,14 @@
     file: "src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: true
           agent: "main"
           comment: "Added multiple subjects support (one per line or comma-separated), enhanced custom messages (para by para), and improved personalization logic for bulk emails"
+        - working: true
+          agent: "testing"
+          comment: "Tested all enhanced personalization features. Multiple subjects input works correctly, allowing subjects to be entered one per line. Enhanced custom messages feature works properly, allowing messages to be separated by double line breaks. Bulk email with individual subjects and messages functionality works as expected. Form validation for missing recipients and subjects works correctly. Helper text is displayed properly. UI is responsive and adapts well to mobile view."
 
 ## metadata:
   created_by: "main_agent"
