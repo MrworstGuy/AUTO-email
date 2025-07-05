@@ -151,9 +151,17 @@ const App = () => {
     
     try {
       const recipients = parseRecipients(formData.recipients);
+      const subjects = parseSubjects(formData.subjects);
+      const customMessages = parseCustomMessages(formData.customMessages);
       
       if (recipients.length === 0) {
         showMessage('Please enter valid email addresses', 'error');
+        setLoading(false);
+        return;
+      }
+
+      if (subjects.length === 0) {
+        showMessage('Please enter at least one subject', 'error');
         setLoading(false);
         return;
       }
@@ -166,6 +174,7 @@ const App = () => {
         
         for (let i = 0; i < recipients.length; i++) {
           const emailContent = formData.personalizedEmails[i] || formData.personalizedEmails[0] || '';
+          const emailSubject = subjects[i] || subjects[subjects.length - 1] || subjects[0];
           
           if (!emailContent.trim()) {
             showMessage(`Please provide email content for recipient ${i + 1}`, 'error');
@@ -177,7 +186,7 @@ const App = () => {
           
           const payload = {
             recipient: recipients[i],
-            subject: formData.subject,
+            subject: emailSubject,
             email_body: emailContent,
             ...(formData.isScheduled && { schedule_time: formData.scheduleTime })
           };
@@ -194,37 +203,54 @@ const App = () => {
         showMessage(`Personalized emails: ${successful}/${recipients.length} sent successfully`, 'success');
         
       } else if (formData.isBulk) {
-        // Regular bulk email sending
-        const contexts = recipients.map(() => ({
-          name: formData.name || 'Valued Customer',
-          offer: formData.offer || 'Special Offer',
-          custom_message: formData.customMessage || ''
-        }));
+        // Enhanced bulk email sending with multiple subjects and custom messages
+        const results = [];
         
-        const endpoint = formData.isScheduled ? '/api/schedule-bulk-email' : '/api/send-bulk-email';
-        
-        const payload = {
-          recipients: recipients,
-          subject: formData.subject,
-          contexts: contexts,
-          template: formData.template || '',
-          ...(formData.isScheduled && { schedule_time: formData.scheduleTime })
-        };
+        for (let i = 0; i < recipients.length; i++) {
+          const emailSubject = subjects[i] || subjects[subjects.length - 1] || subjects[0];
+          const customMessage = customMessages[i] || customMessages[customMessages.length - 1] || formData.customMessage || '';
+          
+          const context = {
+            name: formData.name || 'Valued Customer',
+            offer: formData.offer || 'Special Offer',
+            custom_message: customMessage
+          };
+          
+          const endpoint = formData.isScheduled ? '/api/schedule-email' : '/api/send-email';
+          
+          const payload = {
+            recipient: recipients[i],
+            subject: emailSubject,
+            context: context,
+            template: formData.template || '',
+            ...(formData.isScheduled && { schedule_time: formData.scheduleTime })
+          };
 
-        response = await axios.post(`${backendUrl}${endpoint}`, payload);
-        showMessage(response.data.message || 'Bulk emails sent successfully!', 'success');
+          try {
+            const res = await axios.post(`${backendUrl}${endpoint}`, payload);
+            results.push({ recipient: recipients[i], success: true, message: res.data.message });
+          } catch (error) {
+            results.push({ recipient: recipients[i], success: false, message: error.response?.data?.detail || error.message });
+          }
+        }
+        
+        const successful = results.filter(r => r.success).length;
+        showMessage(`Enhanced bulk emails: ${successful}/${recipients.length} sent successfully`, 'success');
         
       } else {
         // Single email sending
+        const emailSubject = subjects[0] || formData.subject;
+        const customMessage = customMessages[0] || formData.customMessage || '';
+        
         const endpoint = formData.isScheduled ? '/api/schedule-email' : '/api/send-email';
         
         const payload = {
           recipient: recipients[0],
-          subject: formData.subject,
+          subject: emailSubject,
           context: {
             name: formData.name || 'Valued Customer',
             offer: formData.offer || 'Special Offer',
-            custom_message: formData.customMessage || ''
+            custom_message: customMessage
           },
           template: formData.template || '',
           ...(formData.isScheduled && { schedule_time: formData.scheduleTime })
@@ -238,9 +264,11 @@ const App = () => {
       setFormData({
         recipients: '',
         subject: '',
+        subjects: '',
         name: '',
         offer: '',
         customMessage: '',
+        customMessages: '',
         template: '',
         scheduleTime: '',
         isBulk: false,
