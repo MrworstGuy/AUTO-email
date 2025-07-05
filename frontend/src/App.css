@@ -324,6 +324,45 @@ body {
   color: #666;
 }
 
+/* Personalized Messages Textarea */
+.personalized-messages-textarea {
+  width: 100%;
+  min-height: 250px;
+  font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  resize: vertical;
+  background: #f8f9fa;
+}
+
+.personalized-messages-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background: white;
+}
+
+/* Enhanced form sections */
+.form-section {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+}
+
+.form-section h3 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.3em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 /* Personalized Email Styles */
 .personalized-email-item {
   margin-bottom: 25px;
