@@ -158,9 +158,17 @@
     priority: "high"
     needs_retesting: false
     status_history:
+  - task: "Enhanced personalization feature"
+    implemented: true
+    working: true
+    file: "src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
         - working: true
           agent: "main"
-          comment: "React frontend is running on port 3000, compiled successfully"
+          comment: "Added multiple subjects support (one per line or comma-separated), enhanced custom messages (para by para), and improved personalization logic for bulk emails"
 
 ## metadata:
   created_by: "main_agent"
