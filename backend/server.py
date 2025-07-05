@@ -129,20 +129,30 @@ async def render_email_template(template_str: str, context: Dict[str, Any]) -> s
     """Render email template with context"""
     try:
         template = Template(template_str)
-        context['current_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+        
+        # Add sender information and current time
+        context.update({
+            'current_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            'sender_name': "The Team",
+            'sender_email': "hackfinity.innovation@gmail.com",
+            'sender_phone': "+91 7418400160"
+        })
+        
         return template.render(context)
     except Exception as e:
         logger.error(f"Template rendering error: {e}")
         # Return simple fallback
-        return f"""
-        <html>
-        <body>
-            <h2>Hello {context.get('context', {}).get('name', 'Valued Customer')}</h2>
-            <p>Special Offer: {context.get('context', {}).get('offer', 'Contact us for details')}</p>
-            <p>Best regards,<br>The Team</p>
-        </body>
-        </html>
-        """
+        context_data = context.get('context', {})
+        return f"""Hi {context_data.get('name', 'Valued Customer')},
+
+{context_data.get('custom_message', 'Thank you for your interest.')}
+
+{context_data.get('offer', '')}
+
+Best regards,
+The Team
+hackfinity.innovation@gmail.com
++91 7418400160"""
 
 async def send_personalized_email(recipient: str, subject: str, email_body: str) -> bool:
     """Send a personalized email with custom body content"""
