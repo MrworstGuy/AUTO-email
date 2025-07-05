@@ -7,9 +7,11 @@ const App = () => {
   const [formData, setFormData] = useState({
     recipients: '',
     subject: '',
+    subjects: '', // Multiple subjects (one per line or comma-separated)
     name: '',
     offer: '',
     customMessage: '',
+    customMessages: '', // Multiple custom messages (para by para)
     template: '',
     scheduleTime: '',
     isBulk: false,
