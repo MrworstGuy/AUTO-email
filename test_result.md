@@ -172,7 +172,6 @@
   current_focus:
     - "Email sending functionality"
     - "UI responsiveness"
-    - "Backend API endpoints"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
