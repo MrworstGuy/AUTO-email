@@ -536,25 +536,6 @@ Your Name"
             </div>
           </div>
 
-          {/* Email Template Section (for template-based emails) */}
-          {(!formData.isBulk || !formData.personalizedEmails.some(email => email.trim())) && (
-            <div className="form-section">
-              <h3>📝 Email Template (Optional)</h3>
-              <p className="helper-text">Leave blank to use the default template. Use template variables like {"{context.name}"} and {"{context.offer}"}</p>
-              
-              <div className="form-group">
-                <textarea
-                  name="template"
-                  value={formData.template}
-                  onChange={handleInputChange}
-                  placeholder="Enter custom HTML email template..."
-                  rows="6"
-                  className="template-input"
-                />
-              </div>
-            </div>
-          )}
-
           <div className="form-actions">
             <button 
               className="send-button"
