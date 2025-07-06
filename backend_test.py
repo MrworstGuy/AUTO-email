@@ -377,9 +377,8 @@ Subject for user 2""",
         with open(filename, 'rb') as f:
             files = {'file': (filename, f, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
             response = requests.post(
-                f"{self.api_url}/process-excel",
-                files=files,
-                data={"mapping": json.dumps(mapping)}
+                f"{self.api_url}/process-excel?mapping={json.dumps(mapping)}",
+                files=files
             )
         
         # Verify response
