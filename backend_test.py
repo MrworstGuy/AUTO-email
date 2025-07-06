@@ -482,6 +482,15 @@ def run_tests():
     suite.addTest(EmailSenderAPITest("test_get_scheduled_emails"))
     suite.addTest(EmailSenderAPITest("test_get_email_logs"))
     
+    # Add Excel functionality tests
+    suite.addTest(EmailSenderAPITest("test_upload_valid_excel"))
+    suite.addTest(EmailSenderAPITest("test_upload_invalid_file"))
+    suite.addTest(EmailSenderAPITest("test_process_excel_valid_mapping"))
+    suite.addTest(EmailSenderAPITest("test_process_excel_missing_columns"))
+    suite.addTest(EmailSenderAPITest("test_send_excel_emails"))
+    suite.addTest(EmailSenderAPITest("test_schedule_excel_emails"))
+    suite.addTest(EmailSenderAPITest("test_send_excel_emails_empty_list"))
+    
     # Run tests
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
