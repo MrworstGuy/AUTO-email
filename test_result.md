@@ -229,7 +229,8 @@
     - "Column mapping functionality"
     - "Excel-based email sending"
     - "Excel preview and validation"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Add Excel upload functionality"
   test_all: true
   test_priority: "high_first"
 
