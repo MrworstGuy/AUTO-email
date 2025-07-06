@@ -110,6 +110,22 @@ class BulkEmailRequest(BaseModel):
     template: str = ""
     schedule_time: Optional[datetime] = None
 
+class ExcelColumnMapping(BaseModel):
+    email_column: str
+    subject_column: str
+    body_column: str
+    name_column: Optional[str] = None
+
+class ExcelEmailData(BaseModel):
+    email: str
+    subject: str
+    body: str
+    name: Optional[str] = None
+
+class ExcelBulkEmailRequest(BaseModel):
+    emails: List[ExcelEmailData]
+    schedule_time: Optional[datetime] = None
+
 # Default email template - Simple Plain Text
 DEFAULT_TEMPLATE = """Hi {{ context.name }},
 
