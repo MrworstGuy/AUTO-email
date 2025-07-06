@@ -743,6 +743,175 @@ Your Name"
         </div>
       )}
 
+      {activeTab === 'excel' && (
+        <div className="tab-content">
+          <div className="form-section">
+            <h3>📊 Excel Email Upload</h3>
+            <p className="helper-text">Upload an Excel file with email data (email, subject, body columns required)</p>
+            
+            <div className="form-group">
+              <label>Select Excel File (.xlsx, .xls):</label>
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleExcelFileUpload}
+                disabled={excelLoading}
+                className="file-input"
+              />
+              {excelData.file && (
+                <p className="success-text">✅ File uploaded: {excelData.file.name}</p>
+              )}
+            </div>
+
+            {excelData.columns.length > 0 && (
+              <div className="form-section">
+                <h4>🔗 Column Mapping</h4>
+                <p className="helper-text">Map your Excel columns to email fields</p>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Email Column*:</label>
+                    <select
+                      value={excelData.mapping.email_column}
+                      onChange={(e) => handleExcelMappingChange('email_column', e.target.value)}
+                      required
+                    >
+                      <option value="">Select column...</option>
+                      {excelData.columns.map(col => (
+                        <option key={col} value={col}>{col}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Subject Column*:</label>
+                    <select
+                      value={excelData.mapping.subject_column}
+                      onChange={(e) => handleExcelMappingChange('subject_column', e.target.value)}
+                      required
+                    >
+                      <option value="">Select column...</option>
+                      {excelData.columns.map(col => (
+                        <option key={col} value={col}>{col}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Body Column*:</label>
+                    <select
+                      value={excelData.mapping.body_column}
+                      onChange={(e) => handleExcelMappingChange('body_column', e.target.value)}
+                      required
+                    >
+                      <option value="">Select column...</option>
+                      {excelData.columns.map(col => (
+                        <option key={col} value={col}>{col}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Name Column (optional):</label>
+                    <select
+                      value={excelData.mapping.name_column}
+                      onChange={(e) => handleExcelMappingChange('name_column', e.target.value)}
+                    >
+                      <option value="">Select column...</option>
+                      {excelData.columns.map(col => (
+                        <option key={col} value={col}>{col}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-actions">
+                  <button 
+                    className="preview-button"
+                    onClick={handleExcelPreview}
+                    disabled={excelLoading || !excelData.mapping.email_column || !excelData.mapping.subject_column || !excelData.mapping.body_column}
+                  >
+                    {excelLoading ? '⏳ Processing...' : '👁️ Preview Data'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {excelData.isProcessed && (
+              <div className="form-section">
+                <h4>📋 Preview ({excelData.totalEmails} emails found)</h4>
+                <p className="helper-text">Review your email data before sending</p>
+                
+                <div className="form-options">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={excelData.isScheduled}
+                      onChange={(e) => setExcelData(prev => ({ ...prev, isScheduled: e.target.checked }))}
+                    />
+                    <span>⏰ Schedule sending</span>
+                  </label>
+                </div>
+
+                {excelData.isScheduled && (
+                  <div className="form-group">
+                    <label>Schedule Time:</label>
+                    <input
+                      type="datetime-local"
+                      value={excelData.scheduleTime}
+                      onChange={(e) => setExcelData(prev => ({ ...prev, scheduleTime: e.target.value }))}
+                      min={new Date().toISOString().slice(0, 16)}
+                      required
+                    />
+                  </div>
+                )}
+
+                <div className="table-container">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Body Preview</th>
+                        {excelData.mapping.name_column && <th>Name</th>}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {excelData.previewEmails.map((email, index) => (
+                        <tr key={index}>
+                          <td>{email.email}</td>
+                          <td>{email.subject}</td>
+                          <td>{email.body.substring(0, 50)}...</td>
+                          {excelData.mapping.name_column && <td>{email.name || 'N/A'}</td>}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="form-actions">
+                  <button 
+                    className="send-button"
+                    onClick={handleExcelEmailSend}
+                    disabled={excelLoading || (excelData.isScheduled && !excelData.scheduleTime)}
+                  >
+                    {excelLoading ? (
+                      '⏳ Sending...'
+                    ) : excelData.isScheduled ? (
+                      `⏰ Schedule ${excelData.totalEmails} Emails`
+                    ) : (
+                      `🚀 Send ${excelData.totalEmails} Emails Now`
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {activeTab === 'scheduled' && (
         <div className="tab-content">
           <h3>⏰ Scheduled Emails</h3>
