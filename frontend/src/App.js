@@ -88,6 +88,144 @@ const App = () => {
     }));
   };
 
+  // Excel-related functions
+  const handleExcelFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setExcelLoading(true);
+    setMessage('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await axios.post(`${backendUrl}/api/upload-excel`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      setExcelData(prev => ({
+        ...prev,
+        file: file,
+        columns: response.data.columns,
+        mapping: {
+          email_column: '',
+          subject_column: '',
+          body_column: '',
+          name_column: ''
+        },
+        previewEmails: [],
+        totalEmails: 0,
+        isProcessed: false
+      }));
+
+      showMessage(`Excel file uploaded successfully! Found ${response.data.columns.length} columns.`, 'success');
+      
+    } catch (error) {
+      console.error('Excel upload error:', error);
+      showMessage(error.response?.data?.detail || 'Failed to upload Excel file', 'error');
+    } finally {
+      setExcelLoading(false);
+    }
+  };
+
+  const handleExcelMappingChange = (field, value) => {
+    setExcelData(prev => ({
+      ...prev,
+      mapping: {
+        ...prev.mapping,
+        [field]: value
+      }
+    }));
+  };
+
+  const handleExcelPreview = async () => {
+    if (!excelData.file || !excelData.mapping.email_column || !excelData.mapping.subject_column || !excelData.mapping.body_column) {
+      showMessage('Please select a file and map all required columns', 'error');
+      return;
+    }
+
+    setExcelLoading(true);
+    setMessage('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', excelData.file);
+      formData.append('mapping', JSON.stringify(excelData.mapping));
+
+      const response = await axios.post(`${backendUrl}/api/process-excel`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      setExcelData(prev => ({
+        ...prev,
+        previewEmails: response.data.emails,
+        totalEmails: response.data.total_emails,
+        isProcessed: true
+      }));
+
+      showMessage(response.data.message, 'success');
+      
+    } catch (error) {
+      console.error('Excel processing error:', error);
+      showMessage(error.response?.data?.detail || 'Failed to process Excel file', 'error');
+    } finally {
+      setExcelLoading(false);
+    }
+  };
+
+  const handleExcelEmailSend = async () => {
+    if (!excelData.isProcessed) {
+      showMessage('Please process the Excel file first', 'error');
+      return;
+    }
+
+    setExcelLoading(true);
+    setMessage('');
+
+    try {
+      const payload = {
+        emails: excelData.previewEmails,
+        ...(excelData.isScheduled && { schedule_time: excelData.scheduleTime })
+      };
+
+      const response = await axios.post(`${backendUrl}/api/send-excel-emails`, payload);
+
+      if (excelData.isScheduled) {
+        showMessage(response.data.message, 'success');
+      } else {
+        showMessage(response.data.message, 'success');
+      }
+
+      // Reset Excel data
+      setExcelData({
+        file: null,
+        columns: [],
+        mapping: {
+          email_column: '',
+          subject_column: '',
+          body_column: '',
+          name_column: ''
+        },
+        previewEmails: [],
+        totalEmails: 0,
+        isProcessed: false,
+        isScheduled: false,
+        scheduleTime: ''
+      });
+      
+    } catch (error) {
+      console.error('Excel email send error:', error);
+      showMessage(error.response?.data?.detail || 'Failed to send Excel emails', 'error');
+    } finally {
+      setExcelLoading(false);
+    }
+  };
+
   const addPersonalizedEmail = () => {
     setFormData(prev => ({
       ...prev,
