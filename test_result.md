@@ -204,15 +204,18 @@
           comment: "Updated frontend UI to reflect plain text email format. Removed HTML template section, updated placeholders to show professional plain text examples, added note about plain text format in helper text."
   - task: "Add Excel upload functionality"
     implemented: true
-    working: true
+    working: false
     file: "src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: true
           agent: "main"
           comment: "Added new Excel Upload tab with file upload, column mapping, preview, and send functionality. Added Excel-related state management and API integration. Enhanced UI with Excel-specific styling and components."
+        - working: false
+          agent: "testing"
+          comment: "Excel upload tab navigation and file upload functionality work correctly. Column mapping interface works properly. However, the preview functionality fails with a 500 Internal Server Error from the backend. The backend logs show 'ERROR:backend.server:Excel processing error:' when trying to process the Excel file. The frontend correctly sends the request to the /api/process-excel endpoint, but the backend encounters an error."
 
 ## metadata:
   created_by: "main_agent"
