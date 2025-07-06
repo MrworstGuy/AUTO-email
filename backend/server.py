@@ -598,6 +598,142 @@ async def health_check():
         "scheduler_running": scheduler.running
     }
 
+@app.post("/api/upload-excel")
+async def upload_excel(file: UploadFile = File(...)):
+    """Upload Excel file and get column names for mapping"""
+    try:
+        # Validate file type
+        if not file.filename or not file.filename.endswith(('.xlsx', '.xls')):
+            raise HTTPException(status_code=400, detail="Only Excel files (.xlsx, .xls) are supported")
+        
+        # Read file content
+        file_content = await file.read()
+        
+        # Get column names
+        columns = await get_excel_columns(file_content)
+        
+        return {
+            "status": "success",
+            "filename": file.filename,
+            "columns": columns,
+            "message": f"Excel file uploaded successfully. Found {len(columns)} columns."
+        }
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Excel upload error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to process Excel file")
+
+@app.post("/api/process-excel")
+async def process_excel(file: UploadFile = File(...), mapping: str = None):
+    """Process Excel file with column mapping and return preview data"""
+    try:
+        if not mapping:
+            raise HTTPException(status_code=400, detail="Column mapping is required")
+        
+        # Parse mapping JSON
+        import json
+        mapping_data = json.loads(mapping)
+        column_mapping = ExcelColumnMapping(**mapping_data)
+        
+        # Read file content
+        file_content = await file.read()
+        
+        # Process Excel file
+        emails = await process_excel_file(file_content, column_mapping)
+        
+        if not emails:
+            raise HTTPException(status_code=400, detail="No valid email data found in Excel file")
+        
+        return {
+            "status": "success",
+            "total_emails": len(emails),
+            "emails": emails[:10],  # Return first 10 for preview
+            "message": f"Found {len(emails)} valid email entries"
+        }
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Excel processing error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to process Excel file")
+
+@app.post("/api/send-excel-emails")
+async def send_excel_emails(request: ExcelBulkEmailRequest):
+    """Send bulk emails from Excel data"""
+    try:
+        if not request.emails:
+            raise HTTPException(status_code=400, detail="No email data provided")
+        
+        # If scheduled, handle scheduling
+        if request.schedule_time:
+            if request.schedule_time <= datetime.now():
+                raise HTTPException(status_code=400, detail="Schedule time must be in the future")
+            
+            # For now, schedule each email individually
+            # In production, you might want to create a batch job
+            scheduled_jobs = []
+            
+            for email_data in request.emails:
+                job_id = f"excel_email_{uuid.uuid4().hex[:8]}"
+                
+                scheduler.add_job(
+                    send_personalized_email,
+                    trigger="date",
+                    run_date=request.schedule_time,
+                    args=[email_data.email, email_data.subject, email_data.body],
+                    id=job_id,
+                    replace_existing=True
+                )
+                
+                scheduled_jobs.append(job_id)
+                
+                # Store in database
+                if db is not None:
+                    await db.scheduled_emails.insert_one({
+                        "job_id": job_id,
+                        "recipient": email_data.email,
+                        "subject": email_data.subject,
+                        "email_body": email_data.body,
+                        "schedule_time": request.schedule_time,
+                        "status": "scheduled",
+                        "created_at": datetime.utcnow(),
+                        "type": "excel_bulk"
+                    })
+            
+            return {
+                "status": "success",
+                "message": f"Scheduled {len(request.emails)} emails for {request.schedule_time}",
+                "scheduled_jobs": scheduled_jobs
+            }
+        
+        else:
+            # Send immediately
+            results = await send_excel_bulk_emails(request.emails)
+            
+            # Log to database
+            if db is not None:
+                await db.email_logs.insert_one({
+                    "total_emails": len(request.emails),
+                    "results": results,
+                    "sent_at": datetime.utcnow(),
+                    "type": "excel_bulk"
+                })
+            
+            successful = sum(1 for r in results if r["success"])
+            total = len(results)
+            
+            return {
+                "status": "success",
+                "message": f"Excel bulk email completed: {successful}/{total} sent successfully",
+                "results": results
+            }
+        
+    except Exception as e:
+        logger.error(f"Excel bulk email error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
