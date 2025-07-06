@@ -142,6 +142,83 @@ Best regards,
 {{ sender_phone }}
 {% endif %}"""
 
+# Excel utility functions
+async def process_excel_file(file_content: bytes, mapping: ExcelColumnMapping) -> List[ExcelEmailData]:
+    """Process Excel file and extract email data based on column mapping"""
+    try:
+        # Read Excel file
+        df = pd.read_excel(io.BytesIO(file_content))
+        
+        # Check if required columns exist
+        required_columns = [mapping.email_column, mapping.subject_column, mapping.body_column]
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {missing_columns}")
+        
+        # Extract data
+        emails = []
+        for _, row in df.iterrows():
+            # Skip rows with missing essential data
+            if pd.isna(row[mapping.email_column]) or pd.isna(row[mapping.subject_column]) or pd.isna(row[mapping.body_column]):
+                continue
+                
+            email_data = ExcelEmailData(
+                email=str(row[mapping.email_column]).strip(),
+                subject=str(row[mapping.subject_column]).strip(),
+                body=str(row[mapping.body_column]).strip(),
+                name=str(row[mapping.name_column]).strip() if mapping.name_column and not pd.isna(row[mapping.name_column]) else None
+            )
+            emails.append(email_data)
+        
+        return emails
+        
+    except Exception as e:
+        logger.error(f"Excel processing error: {e}")
+        raise ValueError(f"Failed to process Excel file: {str(e)}")
+
+async def get_excel_columns(file_content: bytes) -> List[str]:
+    """Get column names from Excel file"""
+    try:
+        df = pd.read_excel(io.BytesIO(file_content))
+        return df.columns.tolist()
+    except Exception as e:
+        logger.error(f"Excel column extraction error: {e}")
+        raise ValueError(f"Failed to read Excel file: {str(e)}")
+
+async def send_excel_bulk_emails(emails: List[ExcelEmailData]) -> List[Dict]:
+    """Send bulk emails from Excel data"""
+    results = []
+    
+    for email_data in emails:
+        try:
+            success = await send_personalized_email(
+                email_data.email,
+                email_data.subject,
+                email_data.body
+            )
+            results.append({
+                "recipient": email_data.email,
+                "subject": email_data.subject,
+                "success": success,
+                "name": email_data.name
+            })
+            
+            # Add small delay to avoid overwhelming SMTP server
+            await asyncio.sleep(0.5)
+            
+        except Exception as e:
+            logger.error(f"Failed to send email to {email_data.email}: {e}")
+            results.append({
+                "recipient": email_data.email,
+                "subject": email_data.subject,
+                "success": False,
+                "name": email_data.name,
+                "error": str(e)
+            })
+    
+    return results
+
 # Email utility functions
 async def render_email_template(template_str: str, context: Dict[str, Any]) -> str:
     """Render email template with context"""
