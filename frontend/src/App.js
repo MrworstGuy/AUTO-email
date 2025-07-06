@@ -18,7 +18,26 @@ const App = () => {
     isScheduled: false,
     personalizedEmails: [''] // Array to store personalized email bodies
   });
+  
+  // Excel-related state
+  const [excelData, setExcelData] = useState({
+    file: null,
+    columns: [],
+    mapping: {
+      email_column: '',
+      subject_column: '',
+      body_column: '',
+      name_column: ''
+    },
+    previewEmails: [],
+    totalEmails: 0,
+    isProcessed: false,
+    isScheduled: false,
+    scheduleTime: ''
+  });
+  
   const [loading, setLoading] = useState(false);
+  const [excelLoading, setExcelLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [scheduledEmails, setScheduledEmails] = useState([]);
