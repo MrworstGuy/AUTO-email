@@ -335,6 +335,10 @@ Subject for user 2""",
                 data={"mapping": json.dumps(mapping)}
             )
         
+        # Print response for debugging
+        print(f"Response status: {response.status_code}")
+        print(f"Response content: {response.content}")
+        
         # Verify response
         self.assertEqual(response.status_code, 200)
         data = response.json()
