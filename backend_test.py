@@ -252,6 +252,215 @@ Subject for user 2""",
         self.assertEqual(data["status"], "success")
         print(f"✅ Multiline subjects test passed: {data['message']}")
 
+    def create_test_excel_file(self, filename="test_data.xlsx"):
+        """Create a test Excel file for testing"""
+        # Create a DataFrame with test data
+        data = {
+            "email": ["test@example.com", "test2@example.com", "invalid-email"],
+            "subject": ["Test Subject 1", "Test Subject 2", "Test Subject 3"],
+            "body": ["Test email body 1", "Test email body 2", "Test email body 3"],
+            "name": ["Test User 1", "Test User 2", "Test User 3"]
+        }
+        df = pd.DataFrame(data)
+        
+        # Save to Excel file
+        df.to_excel(filename, index=False)
+        print(f"✅ Created test Excel file: {filename}")
+        return filename
+    
+    def test_upload_valid_excel(self):
+        """Test uploading a valid Excel file"""
+        # Create test Excel file
+        filename = self.create_test_excel_file()
+        
+        # Upload the file
+        with open(filename, 'rb') as f:
+            files = {'file': (filename, f, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
+            response = requests.post(f"{self.api_url}/upload-excel", files=files)
+        
+        # Verify response
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["status"], "success")
+        self.assertTrue("columns" in data)
+        self.assertTrue(len(data["columns"]) > 0)
+        self.assertTrue("email" in data["columns"])
+        self.assertTrue("subject" in data["columns"])
+        self.assertTrue("body" in data["columns"])
+        print(f"✅ Upload valid Excel test passed: {data['message']}")
+        
+        # Clean up
+        if os.path.exists(filename):
+            os.remove(filename)
+    
+    def test_upload_invalid_file(self):
+        """Test uploading an invalid file format"""
+        # Create a text file
+        filename = "invalid_file.txt"
+        with open(filename, 'w') as f:
+            f.write("This is not an Excel file")
+        
+        # Upload the file
+        with open(filename, 'rb') as f:
+            files = {'file': (filename, f, 'text/plain')}
+            response = requests.post(f"{self.api_url}/upload-excel", files=files)
+        
+        # Verify response
+        self.assertNotEqual(response.status_code, 200)
+        print("✅ Upload invalid file test passed")
+        
+        # Clean up
+        if os.path.exists(filename):
+            os.remove(filename)
+    
+    def test_process_excel_valid_mapping(self):
+        """Test processing Excel file with valid column mapping"""
+        # Create test Excel file
+        filename = self.create_test_excel_file()
+        
+        # Define column mapping
+        mapping = {
+            "email_column": "email",
+            "subject_column": "subject",
+            "body_column": "body",
+            "name_column": "name"
+        }
+        
+        # Upload and process the file
+        with open(filename, 'rb') as f:
+            files = {'file': (filename, f, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
+            response = requests.post(
+                f"{self.api_url}/process-excel",
+                files=files,
+                data={"mapping": json.dumps(mapping)}
+            )
+        
+        # Verify response
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["status"], "success")
+        self.assertTrue("emails" in data)
+        self.assertTrue(len(data["emails"]) > 0)
+        self.assertEqual(data["emails"][0]["email"], "test@example.com")
+        self.assertEqual(data["emails"][0]["subject"], "Test Subject 1")
+        print(f"✅ Process Excel with valid mapping test passed: {data['message']}")
+        
+        # Clean up
+        if os.path.exists(filename):
+            os.remove(filename)
+    
+    def test_process_excel_missing_columns(self):
+        """Test processing Excel with missing required columns"""
+        # Create a DataFrame with missing columns
+        data = {
+            "email": ["test@example.com", "test2@example.com"],
+            # Missing subject column
+            "body": ["Test email body 1", "Test email body 2"],
+        }
+        filename = "missing_columns.xlsx"
+        pd.DataFrame(data).to_excel(filename, index=False)
+        
+        # Define column mapping with non-existent column
+        mapping = {
+            "email_column": "email",
+            "subject_column": "subject",  # This column doesn't exist
+            "body_column": "body"
+        }
+        
+        # Upload and process the file
+        with open(filename, 'rb') as f:
+            files = {'file': (filename, f, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
+            response = requests.post(
+                f"{self.api_url}/process-excel",
+                files=files,
+                data={"mapping": json.dumps(mapping)}
+            )
+        
+        # Verify response
+        self.assertNotEqual(response.status_code, 200)
+        print("✅ Process Excel with missing columns test passed")
+        
+        # Clean up
+        if os.path.exists(filename):
+            os.remove(filename)
+    
+    def test_send_excel_emails(self):
+        """Test sending emails from Excel data"""
+        # Create email data
+        emails = [
+            {
+                "email": "test@example.com",
+                "subject": "Test Excel Email 1",
+                "body": "This is a test email body 1",
+                "name": "Test User 1"
+            },
+            {
+                "email": "test2@example.com",
+                "subject": "Test Excel Email 2",
+                "body": "This is a test email body 2",
+                "name": "Test User 2"
+            }
+        ]
+        
+        # Send emails
+        payload = {
+            "emails": emails
+        }
+        
+        response = requests.post(f"{self.api_url}/send-excel-emails", json=payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["status"], "success")
+        self.assertTrue("results" in data)
+        self.assertEqual(len(data["results"]), 2)
+        print(f"✅ Send Excel emails test passed: {data['message']}")
+    
+    def test_schedule_excel_emails(self):
+        """Test scheduling emails from Excel data"""
+        # Schedule for 5 minutes in the future
+        schedule_time = (datetime.now() + timedelta(minutes=5)).isoformat()
+        
+        # Create email data
+        emails = [
+            {
+                "email": "test@example.com",
+                "subject": "Test Scheduled Excel Email 1",
+                "body": "This is a scheduled test email body 1",
+                "name": "Test User 1"
+            },
+            {
+                "email": "test2@example.com",
+                "subject": "Test Scheduled Excel Email 2",
+                "body": "This is a scheduled test email body 2",
+                "name": "Test User 2"
+            }
+        ]
+        
+        # Schedule emails
+        payload = {
+            "emails": emails,
+            "schedule_time": schedule_time
+        }
+        
+        response = requests.post(f"{self.api_url}/send-excel-emails", json=payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["status"], "success")
+        self.assertTrue("scheduled_jobs" in data)
+        self.assertEqual(len(data["scheduled_jobs"]), 2)
+        print(f"✅ Schedule Excel emails test passed: {data['message']}")
+    
+    def test_send_excel_emails_empty_list(self):
+        """Test sending emails with empty email list"""
+        # Send empty email list
+        payload = {
+            "emails": []
+        }
+        
+        response = requests.post(f"{self.api_url}/send-excel-emails", json=payload)
+        self.assertNotEqual(response.status_code, 200)
+        print("✅ Send Excel emails with empty list test passed")
+
 def test_root_endpoint(self):
         """Test the root API endpoint"""
         response = requests.get(f"{self.api_url}/")
