@@ -1,8 +1,11 @@
 import requests
 import unittest
 import json
+import os
+import pandas as pd
 from datetime import datetime, timedelta
 import time
+import io
 
 class EmailSenderAPITest(unittest.TestCase):
     """Test suite for the Automatic Email Sender API"""
