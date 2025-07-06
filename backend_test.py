@@ -10,7 +10,7 @@ class EmailSenderAPITest(unittest.TestCase):
     def setUp(self):
         """Set up test environment before each test"""
         # Use the public endpoint from frontend/.env
-        self.base_url = "https://5132be6d-f3e4-42db-b354-4dd6dbea229f.preview.emergentagent.com"
+        self.base_url = "https://0d9ea18d-b08b-4851-b1c4-c0d1d80e070d.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
         self.test_email = "test@example.com"  # Use a test email that won't actually receive emails
         
