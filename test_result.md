@@ -219,9 +219,10 @@
 
 ## test_plan:
   current_focus:
-    - "Plain text email functionality"
-    - "Email template conversion"
-    - "UI updates for plain text format"
+    - "Excel file upload and processing"
+    - "Column mapping functionality"
+    - "Excel-based email sending"
+    - "Excel preview and validation"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
@@ -237,3 +238,5 @@
       message: "Completed testing of the enhanced personalization feature. All new functionality works correctly: multiple subjects input, enhanced custom messages with paragraph breaks, bulk email with individual subjects and messages. Form validation works properly for missing recipients and subjects. UI is responsive and user-friendly with clear helper text. No issues found with the implementation."
     - agent: "main"
       message: "Converted email system from fancy HTML templates to simple plain text format. Replaced complex HTML template with clean plain text template similar to professional business emails. Updated email sending functions to send plain text instead of HTML. Modified frontend UI to reflect plain text format with updated placeholders and helper text."
+    - agent: "main"
+      message: "Added comprehensive Excel functionality: Backend now supports Excel file upload, column mapping, and bulk email sending from Excel data. Frontend includes new Excel Upload tab with file upload, column mapping interface, preview functionality, and sending capabilities. Users can now upload Excel files with email, subject, and body columns, map them to appropriate fields, preview the data, and send bulk emails. Both immediate and scheduled sending supported."
