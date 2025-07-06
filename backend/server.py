@@ -149,30 +149,53 @@ async def process_excel_file(file_content: bytes, mapping: ExcelColumnMapping) -
         # Read Excel file
         df = pd.read_excel(io.BytesIO(file_content))
         
+        if df.empty:
+            raise ValueError("Excel file is empty")
+        
         # Check if required columns exist
         required_columns = [mapping.email_column, mapping.subject_column, mapping.body_column]
-        missing_columns = [col for col in required_columns if col not in df.columns]
+        available_columns = df.columns.tolist()
+        missing_columns = [col for col in required_columns if col not in available_columns]
         
         if missing_columns:
-            raise ValueError(f"Missing required columns: {missing_columns}")
+            raise ValueError(f"Missing required columns: {missing_columns}. Available columns: {available_columns}")
         
         # Extract data
         emails = []
-        for _, row in df.iterrows():
-            # Skip rows with missing essential data
-            if pd.isna(row[mapping.email_column]) or pd.isna(row[mapping.subject_column]) or pd.isna(row[mapping.body_column]):
-                continue
+        for index, row in df.iterrows():
+            try:
+                # Skip rows with missing essential data
+                if pd.isna(row[mapping.email_column]) or pd.isna(row[mapping.subject_column]) or pd.isna(row[mapping.body_column]):
+                    logger.info(f"Skipping row {index + 2} due to missing essential data")
+                    continue
                 
-            email_data = ExcelEmailData(
-                email=str(row[mapping.email_column]).strip(),
-                subject=str(row[mapping.subject_column]).strip(),
-                body=str(row[mapping.body_column]).strip(),
-                name=str(row[mapping.name_column]).strip() if mapping.name_column and not pd.isna(row[mapping.name_column]) else None
-            )
-            emails.append(email_data)
+                # Validate email format (basic check)
+                email_value = str(row[mapping.email_column]).strip()
+                if '@' not in email_value:
+                    logger.info(f"Skipping row {index + 2} due to invalid email format: {email_value}")
+                    continue
+                    
+                email_data = ExcelEmailData(
+                    email=email_value,
+                    subject=str(row[mapping.subject_column]).strip(),
+                    body=str(row[mapping.body_column]).strip(),
+                    name=str(row[mapping.name_column]).strip() if mapping.name_column and mapping.name_column in df.columns and not pd.isna(row[mapping.name_column]) else None
+                )
+                emails.append(email_data)
+                
+            except Exception as e:
+                logger.warning(f"Error processing row {index + 2}: {e}")
+                continue
+        
+        if not emails:
+            raise ValueError("No valid email entries found in the Excel file")
         
         return emails
         
+    except pd.errors.EmptyDataError:
+        raise ValueError("Excel file is empty or corrupted")
+    except pd.errors.ParserError as e:
+        raise ValueError(f"Failed to parse Excel file: {str(e)}")
     except Exception as e:
         logger.error(f"Excel processing error: {e}")
         raise ValueError(f"Failed to process Excel file: {str(e)}")
