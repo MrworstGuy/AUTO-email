@@ -634,8 +634,13 @@ async def process_excel(file: UploadFile = File(...), mapping: str = None):
         
         # Parse mapping JSON
         import json
-        mapping_data = json.loads(mapping)
-        column_mapping = ExcelColumnMapping(**mapping_data)
+        try:
+            mapping_data = json.loads(mapping)
+            column_mapping = ExcelColumnMapping(**mapping_data)
+        except json.JSONDecodeError as e:
+            raise HTTPException(status_code=400, detail=f"Invalid mapping JSON: {str(e)}")
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Invalid column mapping: {str(e)}")
         
         # Read file content
         file_content = await file.read()
@@ -653,11 +658,14 @@ async def process_excel(file: UploadFile = File(...), mapping: str = None):
             "message": f"Found {len(emails)} valid email entries"
         }
         
+    except HTTPException:
+        raise
     except ValueError as e:
+        logger.error(f"Excel processing validation error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"Excel processing error: {e}")
-        raise HTTPException(status_code=500, detail="Failed to process Excel file")
+        raise HTTPException(status_code=500, detail=f"Failed to process Excel file: {str(e)}")
 
 @app.post("/api/send-excel-emails")
 async def send_excel_emails(request: ExcelBulkEmailRequest):
