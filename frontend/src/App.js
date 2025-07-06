@@ -468,6 +468,12 @@ const App = () => {
           📧 Send Emails
         </button>
         <button 
+          className={activeTab === 'excel' ? 'tab active' : 'tab'}
+          onClick={() => setActiveTab('excel')}
+        >
+          📊 Excel Upload
+        </button>
+        <button 
           className={activeTab === 'scheduled' ? 'tab active' : 'tab'}
           onClick={() => setActiveTab('scheduled')}
         >
