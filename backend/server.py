@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
@@ -15,6 +15,8 @@ import logging
 from jinja2 import Template
 import uuid
 import asyncio
+import pandas as pd
+import io
 
 # Load environment variables
 load_dotenv()
